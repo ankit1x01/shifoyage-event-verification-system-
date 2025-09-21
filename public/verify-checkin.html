@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in Verification - Shifoyage Event</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .verification-card {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .status-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .status-error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        .status-processing {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="verification-card">
+        <!-- Header -->
+        <div id="header" class="status-processing text-white p-6 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <span class="text-xl font-bold">S</span>
+                </div>
+                <h1 class="ml-3 text-2xl font-bold">Shifoyage Event</h1>
+            </div>
+            <p class="text-sm opacity-90">Automatic Check-in System</p>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+            <!-- Processing State -->
+            <div id="processing" class="text-center">
+                <div class="spinner w-16 h-16 mx-auto mb-4 border-4 border-blue-200 border-t-blue-600 rounded-full"></div>
+                <p class="text-gray-600 text-lg font-medium">Processing Check-in...</p>
+                <p class="text-gray-500 text-sm mt-2">Please wait while we verify and check you in</p>
+            </div>
+
+            <!-- Success State -->
+            <div id="success" class="hidden text-center">
+                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Check-in Successful! 🎉</h2>
+                <p class="text-gray-600 mb-4">Welcome to the event!</p>
+
+                <div class="bg-green-50 p-4 rounded-lg mb-4">
+                    <h3 class="font-semibold text-gray-700 mb-3">Attendee Details</h3>
+                    <div class="space-y-2 text-left">
+                        <p><span class="font-medium">Name:</span> <span id="attendee-name" class="text-gray-900"></span></p>
+                        <p><span class="font-medium">Email:</span> <span id="attendee-email" class="text-gray-900"></span></p>
+                        <p><span class="font-medium">QR ID:</span> <span id="attendee-qrid" class="text-gray-900"></span></p>
+                        <p><span class="font-medium">Check-in Time:</span> <span id="checkin-time" class="text-gray-900"></span></p>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-sm text-gray-600">You can now enjoy the event! 🎵</p>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div id="error" class="hidden text-center">
+                <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Check-in Failed</h2>
+                <p class="text-gray-600 mb-4" id="error-message">Something went wrong</p>
+
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <p class="text-sm text-red-700">
+                        QR ID: <span id="error-qrid" class="font-mono font-semibold"></span>
+                    </p>
+                    <p class="text-sm text-red-600 mt-2">
+                        Please contact event staff for assistance.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyABY76GZlMiQOGuaBOJlo-pyLP9uPy-Hnk",
+            authDomain: "swar-e-safar.firebaseapp.com",
+            projectId: "swar-e-safar",
+            storageBucket: "swar-e-safar.firebasestorage.app",
+            messagingSenderId: "857144891571",
+            appId: "1:857144891571:web:6fc8922a8a43fdf7a1b8c6",
+            measurementId: "G-ZQ5L1E8M10"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Get query parameter
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Show/hide sections
+        function showSection(sectionId) {
+            document.getElementById('processing').classList.add('hidden');
+            document.getElementById('success').classList.add('hidden');
+            document.getElementById('error').classList.add('hidden');
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        // Update header status
+        function updateHeader(status) {
+            const header = document.getElementById('header');
+            header.className = `${status} text-white p-6 text-center`;
+        }
+
+        // Format timestamp
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'Just now';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        // Check-in attendee
+        async function checkInAttendee(qrId) {
+            try {
+                // Find attendee by QR ID
+                const attendeesRef = collection(db, "attendees");
+                const q = query(attendeesRef, where("qrId", "==", qrId));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    throw new Error("Attendee not found with this QR code");
+                }
+
+                const attendeeDoc = querySnapshot.docs[0];
+                const attendeeData = attendeeDoc.data();
+
+                // Check if already checked in
+                if (attendeeData.checkIn) {
+                    // Show success even if already checked in
+                    showSuccessState(attendeeData, attendeeData.checkedInAt);
+                    return;
+                }
+
+                // Perform check-in
+                await updateDoc(doc(db, "attendees", attendeeDoc.id), {
+                    checkIn: true,
+                    checkedInAt: serverTimestamp()
+                });
+
+                // Show success
+                showSuccessState(attendeeData, new Date());
+
+            } catch (error) {
+                console.error("Check-in error:", error);
+                showErrorState(qrId, error.message);
+            }
+        }
+
+        // Show success state
+        function showSuccessState(attendeeData, checkinTime) {
+            updateHeader('status-success');
+
+            document.getElementById('attendee-name').textContent = attendeeData.fullName || 'N/A';
+            document.getElementById('attendee-email').textContent = attendeeData.email || 'N/A';
+            document.getElementById('attendee-qrid').textContent = attendeeData.qrId || 'N/A';
+            document.getElementById('checkin-time').textContent = formatTimestamp(checkinTime);
+
+            showSection('success');
+        }
+
+        // Show error state
+        function showErrorState(qrId, errorMessage) {
+            updateHeader('status-error');
+
+            document.getElementById('error-qrid').textContent = qrId || 'Unknown';
+            document.getElementById('error-message').textContent = errorMessage || 'Unknown error occurred';
+
+            showSection('error');
+        }
+
+        // Initialize the page
+        async function init() {
+            const qrId = getQueryParam('qrId');
+
+            if (!qrId) {
+                showErrorState('', 'No QR ID provided in URL');
+                return;
+            }
+
+            // Add a small delay for better UX
+            setTimeout(async () => {
+                await checkInAttendee(qrId);
+            }, 1500);
+        }
+
+        // Start the process when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+</body>
+</html>
