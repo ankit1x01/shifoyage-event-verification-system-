@@ -1,0 +1,162 @@
+/* TailwindCSS-style utility classes */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f3f4f6;
+}
+
+/* Basic utility classes */
+.p-4 { padding: 1rem; }
+.p-3 { padding: 0.75rem; }
+.p-2 { padding: 0.5rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+
+.m-4 { margin: 1rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1rem; }
+
+.w-full { width: 100%; }
+.max-w-2xl { max-width: 42rem; }
+.max-w-6xl { max-width: 72rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.min-h-screen { min-height: 100vh; }
+
+.flex { display: flex; }
+.flex-1 { flex: 1; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.space-y-1 > * + * { margin-top: 0.25rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.flex-wrap { flex-wrap: wrap; }
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.text-sm { font-size: 0.875rem; }
+.text-xs { font-size: 0.75rem; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+.font-mono { font-family: monospace; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.bg-white { background-color: white; }
+.bg-black { background-color: black; }
+.bg-gray-100 { background-color: #f3f4f6; }
+.bg-gray-50 { background-color: #f9fafb; }
+.bg-gray-800 { background-color: #1f2937; }
+.bg-gray-900 { background-color: #111827; }
+.bg-green-600 { background-color: #16a34a; }
+.bg-green-700 { background-color: #15803d; }
+.bg-green-800 { background-color: #166534; }
+.bg-green-100 { background-color: #dcfce7; }
+.bg-blue-600 { background-color: #2563eb; }
+.bg-blue-700 { background-color: #1d4ed8; }
+.bg-blue-100 { background-color: #dbeafe; }
+.bg-purple-700 { background-color: #7c3aed; }
+.bg-purple-800 { background-color: #6b21a8; }
+.bg-red-600 { background-color: #dc2626; }
+.bg-yellow-50 { background-color: #fefce8; }
+.bg-yellow-100 { background-color: #fef3c7; }
+
+.text-white { color: white; }
+.text-black { color: black; }
+.text-gray-600 { color: #4b5563; }
+.text-green-800 { color: #166534; }
+.text-blue-800 { color: #1e40af; }
+.text-yellow-800 { color: #92400e; }
+.text-purple-700 { color: #7c3aed; }
+
+.border { border: 1px solid #d1d5db; }
+.border-b { border-bottom: 1px solid #d1d5db; }
+.border-t { border-top: 1px solid #d1d5db; }
+.rounded { border-radius: 0.25rem; }
+.shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
+
+.cursor-pointer { cursor: pointer; }
+.sticky { position: sticky; }
+.top-0 { top: 0; }
+.z-10 { z-index: 10; }
+
+.hover\:bg-gray-50:hover { background-color: #f9fafb; }
+.hover\:bg-gray-800:hover { background-color: #1f2937; }
+.hover\:bg-green-700:hover { background-color: #15803d; }
+.hover\:bg-green-800:hover { background-color: #166534; }
+.hover\:bg-blue-700:hover { background-color: #1d4ed8; }
+.hover\:bg-purple-800:hover { background-color: #6b21a8; }
+
+.disabled\:opacity-50:disabled { opacity: 0.5; }
+
+input, button {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+input {
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Print styles */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  #print-area,
+  #print-area * {
+    visibility: visible !important;
+  }
+
+  #print-area {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 9999 !important;
+  }
+}

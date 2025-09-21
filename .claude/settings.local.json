@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(firebase projects:list:*)",
+      "Bash(firebase login:*)",
+      "Bash(firebase deploy:*)",
+      "Bash(firebase use:*)",
+      "Bash(copy firestore-test.rules firestore.rules)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

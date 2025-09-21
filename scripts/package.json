@@ -1,0 +1,11 @@
+{
+  "name": "import-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "firebase": "^12.3.0"
+  },
+  "scripts": {
+    "import": "node import_attendees.js"
+  }
+}
