@@ -7,7 +7,12 @@
       "Bash(firebase login:*)",
       "Bash(firebase deploy:*)",
       "Bash(firebase use:*)",
-      "Bash(copy firestore-test.rules firestore.rules)"
+      "Bash(copy firestore-test.rules firestore.rules)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(node import_attendees.js)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

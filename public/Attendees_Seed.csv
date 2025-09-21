@@ -1,59 +1,59 @@
 fullName,status,category,checkIn,couponStatus,reelLink,reviewUrl,qrId
-Himalaya,paid,attendee,False,none,,,
-Shikha,paid,attendee,False,none,,,
-Ankita,paid,attendee,False,none,,,
-Nikita,paid,attendee,False,none,,,
-Manbir,paid,attendee,False,none,,,
-Viraj,paid,attendee,False,none,,,
-Shankar Sarvan,paid,attendee,False,none,,,
-Cheran,paid,attendee,False,none,,,
-Vanshika,paid,attendee,False,none,,,
-Satya Shri,paid,attendee,False,none,,,
-Rohit,paid,attendee,False,none,,,
-Amit,paid,attendee,False,none,,,
-Ambika Rai,paid,attendee,False,none,,,
-Nisha,paid,attendee,False,none,,,
-Saima,paid,attendee,False,none,,,
-Bhumika,paid,attendee,False,none,,,
-Kamal,paid,attendee,False,none,,,
-Piyush,paid,attendee,False,none,,,
-Arushi,paid,attendee,False,none,,,
-Arushi’s Friend,paid,attendee,False,none,,,
-Prince Nagar,paid,attendee,False,none,,,
-Sultan Jahan,paid,attendee,False,none,,,
-Rajhansh Chauhan,paid,attendee,False,none,,,
-Prachi,paid,attendee,False,none,,,
-Prajjwal,paid,attendee,False,none,,,
-Nimra,paid,attendee,False,none,,,
-Rajni,paid,attendee,False,none,,,
-Poorva,pending,attendee,False,none,,,
-Prabhu,pending,attendee,False,none,,,
-Mohit,pending,attendee,False,none,,,
-Sourabh,pending,attendee,False,none,,,
-Neel,pending,attendee,False,none,,,
-Neel’s Friend,pending,attendee,False,none,,,
-Virendra,pending,attendee,False,none,,,
-Mini,pending,attendee,False,none,,,
-Utkarsh,internal,staff,False,none,,,
-Ashish,internal,staff,False,none,,,
-Darsh,internal,staff,False,none,,,
-Parab,internal,staff,False,none,,,
-Abhi,internal,staff,False,none,,,
-Dishant,internal,staff,False,none,,,
-Navdeep,internal,staff,False,none,,,
-Amar,internal,staff,False,none,,,
-Anay,internal,staff,False,none,,,
-Vansh,internal,staff,False,none,,,
-Navdeep’s Old Brother,internal,staff,False,none,,,
-Akash,internal,staff,False,none,,,
-Ankur,internal,staff,False,none,,,
-Kuhoo,internal,staff,False,none,,,
-Ankit Kushwa,internal,staff,False,none,,,
-Anni,internal,staff,False,none,,,
-Chirag,internal,staff,False,none,,,
-Chirag’s Friend,internal,staff,False,none,,,
-Akshita,paid,bhopali_point,False,none,,,
-Ayush,paid,bhopali_point,False,none,,,
-Shubhash,paid,attendee,False,none,,,
-Rishi,paid,attendee,False,none,,,
-Anupama,paid,attendee,False,none,,,
+Himalaya,paid,attendee,False,none,,,QR_AEZV8IQP
+Shikha,paid,attendee,False,none,,,QR_DR2XX0GV
+Ankita,paid,attendee,False,none,,,QR_ZB4VIXI8
+Nikita,paid,attendee,False,none,,,QR_TGK1WLEY
+Manbir,paid,attendee,False,none,,,QR_5TB0Y92C
+Viraj,paid,attendee,False,none,,,QR_AOJ8MII5
+Shankar Sarvan,paid,attendee,False,none,,,QR_7EIG8I1P
+Cheran,paid,attendee,False,none,,,QR_MH1I6AM5
+Vanshika,paid,attendee,False,none,,,QR_2LFFWUFI
+Satya Shri,paid,attendee,False,none,,,QR_Z379CJPS
+Rohit,paid,attendee,False,none,,,QR_KD7K908O
+Amit,paid,attendee,False,none,,,QR_4NFLLJO5
+Ambika Rai,paid,attendee,False,none,,,QR_41BCCHB0
+Nisha,paid,attendee,False,none,,,QR_XGJS34KE
+Saima,paid,attendee,False,none,,,QR_G6CRY2O8
+Bhumika,paid,attendee,False,none,,,QR_ISHY2TLW
+Kamal,paid,attendee,False,none,,,QR_NADA4RXW
+Piyush,paid,attendee,False,none,,,QR_MH0FI7F9
+Arushi,paid,attendee,False,none,,,QR_V2GYHBKH
+Arushi's Friend,paid,attendee,False,none,,,QR_NVZB1I96
+Prince Nagar,paid,attendee,False,none,,,QR_6VKLJD1E
+Sultan Jahan,paid,attendee,False,none,,,QR_JFC7UXI4
+Rajhansh Chauhan,paid,attendee,False,none,,,QR_HFW25SBK
+Prachi,paid,attendee,False,none,,,QR_HFDEYJ50
+Prajjwal,paid,attendee,False,none,,,QR_9NLC4ZPN
+Nimra,paid,attendee,False,none,,,QR_CT7ZNQWM
+Rajni,paid,attendee,False,none,,,QR_0F0IRPVF
+Poorva,pending,attendee,False,none,,,QR_DP7GZ9KX
+Prabhu,pending,attendee,False,none,,,QR_0WHMYYKP
+Mohit,pending,attendee,False,none,,,QR_9FIHWL3Z
+Sourabh,pending,attendee,False,none,,,QR_I19Y0PF7
+Neel,pending,attendee,False,none,,,QR_CUK8GIRM
+Neel's Friend,pending,attendee,False,none,,,QR_W16KHF7P
+Virendra,pending,attendee,False,none,,,QR_2T3DAZOK
+Mini,pending,attendee,False,none,,,QR_TWRDYKKS
+Utkarsh,internal,staff,False,none,,,QR_B18LK920
+Ashish,internal,staff,False,none,,,QR_2J1QSORD
+Darsh,internal,staff,False,none,,,QR_AG7E4KN7
+Parab,internal,staff,False,none,,,QR_7VU7KNF2
+Abhi,internal,staff,False,none,,,QR_MPKVUF5W
+Dishant,internal,staff,False,none,,,QR_GWRL8681
+Navdeep,internal,staff,False,none,,,QR_OO5BIU5E
+Amar,internal,staff,False,none,,,QR_KWPDWIMJ
+Anay,internal,staff,False,none,,,QR_OG3BRU90
+Vansh,internal,staff,False,none,,,QR_CLDES72Y
+Navdeep's Old Brother,internal,staff,False,none,,,QR_7YA4MISQ
+Akash,internal,staff,False,none,,,QR_XKYXHY4E
+Ankur,internal,staff,False,none,,,QR_NJVZ2JL5
+Kuhoo,internal,staff,False,none,,,QR_2CAXHY6F
+Ankit Kushwa,internal,staff,False,none,,,QR_N5008GQ7
+Anni,internal,staff,False,none,,,QR_MWDCMH0C
+Chirag,internal,staff,False,none,,,QR_WQRJ7XM6
+Chirag's Friend,internal,staff,False,none,,,QR_TD4FQXGN
+Akshita,paid,bhopali_point,False,none,,,QR_6REISNK8
+Ayush,paid,bhopali_point,False,none,,,QR_RQ15HBSB
+Shubhash,paid,attendee,False,none,,,QR_SH8K3M9X
+Rishi,paid,attendee,False,none,,,QR_RI7Y2Q4N
+Anupama,paid,attendee,False,none,,,QR_AN5L6P8W

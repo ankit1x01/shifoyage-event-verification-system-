@@ -522,6 +522,268 @@ function AdminPanel() {
     }
   };
 
+  // Download attendee list with verification links
+  const downloadAttendeeLinks = () => {
+    if (list.length === 0) {
+      alert("No attendees to download. Load attendees first.");
+      return;
+    }
+
+    // Base URL for verification page - update this to your actual deployment URL
+    const baseUrl = window.location.origin + "/attendee-verify.html";
+    
+    // Create CSV content
+    const csvHeaders = "Name,QR ID,Verification Link,Status,Category,Checked In,Coupon Status\n";
+    const csvRows = list.map(attendee => {
+      const verificationLink = `${baseUrl}?qrId=${attendee.qrId}`;
+      return `"${attendee.fullName}","${attendee.qrId}","${verificationLink}","${attendee.status}","${attendee.category}","${attendee.checkIn ? 'Yes' : 'No'}","${attendee.couponStatus || 'none'}"`;
+    }).join('\n');
+    
+    const csvContent = csvHeaders + csvRows;
+
+    // Create downloadable file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `attendee_verification_links_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  // Generate text list for sharing
+  const generateTextList = () => {
+    if (list.length === 0) {
+      alert("No attendees to generate list. Load attendees first.");
+      return;
+    }
+
+    const baseUrl = window.location.origin + "/attendee-verify.html";
+    
+    let textContent = `🎵 SWAR-E-SAFAR Event Pass Links 🎵\n`;
+    textContent += `Generated on: ${new Date().toLocaleDateString()}\n`;
+    textContent += `Total Attendees: ${list.length}\n\n`;
+    
+    list.forEach((attendee, index) => {
+      const verificationLink = `${baseUrl}?qrId=${attendee.qrId}`;
+      textContent += `${index + 1}. ${attendee.fullName}\n`;
+      textContent += `   QR ID: ${attendee.qrId}\n`;
+      textContent += `   Link: ${verificationLink}\n`;
+      textContent += `   Status: ${attendee.status} | ${attendee.checkIn ? 'Checked In' : 'Not Checked In'}\n\n`;
+    });
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(textContent).then(() => {
+      alert("✅ Attendee list copied to clipboard!");
+    }).catch(err => {
+      // Fallback: show in a textarea for manual copying
+      const textarea = document.createElement('textarea');
+      textarea.value = textContent;
+      textarea.style.width = '100%';
+      textarea.style.height = '400px';
+      
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000';
+      
+      const content = document.createElement('div');
+      content.style.cssText = 'background:white;padding:20px;border-radius:8px;max-width:90%;max-height:90%;overflow:auto';
+      content.innerHTML = '<h3>Copy Attendee List (Ctrl+A, Ctrl+C)</h3>';
+      content.appendChild(textarea);
+      
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = 'Close';
+      closeBtn.style.cssText = 'margin-top:10px;padding:8px 16px;background:#000;color:white;border:none;border-radius:4px;cursor:pointer';
+      closeBtn.onclick = () => document.body.removeChild(modal);
+      content.appendChild(closeBtn);
+      
+      modal.appendChild(content);
+      document.body.appendChild(modal);
+      textarea.select();
+    });
+  };
+
+  // Comprehensive Firebase Query & Download
+  const downloadAllFirebaseData = async () => {
+    try {
+      setLoading(true);
+      
+      // Query all attendees from Firebase
+      const attendeesRef = collection(db, "attendees");
+      const allAttendeesQuery = query(attendeesRef, orderBy("fullName"));
+      const querySnapshot = await getDocs(allAttendeesQuery);
+      
+      const allAttendees = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        allAttendees.push({
+          id: doc.id,
+          ...data,
+          // Ensure we have a QR ID
+          qrId: data.qrId || doc.id,
+          // Format timestamps if they exist
+          createdAt: data.createdAt?.toDate?.()?.toLocaleString() || 'N/A',
+          updatedAt: data.updatedAt?.toDate?.()?.toLocaleString() || 'N/A',
+          checkInTime: data.checkInTime?.toDate?.()?.toLocaleString() || 'N/A'
+        });
+      });
+
+      if (allAttendees.length === 0) {
+        alert("No attendees found in Firebase database.");
+        return;
+      }
+
+      // Base URL for verification links
+      const baseUrl = window.location.origin + "/attendee-verify.html";
+      
+      // Create comprehensive CSV content
+      const csvHeaders = [
+        "Name", "QR ID", "Verification Link", "Status", "Category", 
+        "Email", "Phone", "Checked In", "Check-in Time", "Coupon Status",
+        "Created At", "Updated At", "Firebase Doc ID"
+      ].join(",") + "\n";
+
+      const csvRows = allAttendees.map(attendee => {
+        const verificationLink = `${baseUrl}?qrId=${attendee.qrId}`;
+        return [
+          `"${attendee.fullName || 'N/A'}"`,
+          `"${attendee.qrId}"`,
+          `"${verificationLink}"`,
+          `"${attendee.status || 'N/A'}"`,
+          `"${attendee.category || 'N/A'}"`,
+          `"${attendee.email || 'N/A'}"`,
+          `"${attendee.phone || 'N/A'}"`,
+          `"${attendee.checkIn ? 'Yes' : 'No'}"`,
+          `"${attendee.checkInTime}"`,
+          `"${attendee.couponStatus || 'none'}"`,
+          `"${attendee.createdAt}"`,
+          `"${attendee.updatedAt}"`,
+          `"${attendee.id}"`
+        ].join(",");
+      }).join("\n");
+
+      const csvContent = csvHeaders + csvRows;
+
+      // Create and download CSV file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `firebase_attendees_complete_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      // Also create a detailed text report
+      let textReport = `🎵 SHIFOYAGE EVENT - COMPLETE ATTENDEE DATABASE 🎵\n`;
+      textReport += `========================================================\n`;
+      textReport += `Generated: ${new Date().toLocaleString()}\n`;
+      textReport += `Total Attendees: ${allAttendees.length}\n`;
+      textReport += `Database: Firebase Firestore\n`;
+      textReport += `========================================================\n\n`;
+      
+      // Summary statistics
+      const stats = {
+        total: allAttendees.length,
+        checkedIn: allAttendees.filter(a => a.checkIn).length,
+        paid: allAttendees.filter(a => a.status === 'paid').length,
+        pending: allAttendees.filter(a => a.status === 'pending').length,
+        internal: allAttendees.filter(a => a.status === 'internal').length,
+        withCoupons: allAttendees.filter(a => a.couponStatus === 'issued').length
+      };
+
+      textReport += `📊 STATISTICS:\n`;
+      textReport += `• Total Attendees: ${stats.total}\n`;
+      textReport += `• Checked In: ${stats.checkedIn} (${((stats.checkedIn/stats.total)*100).toFixed(1)}%)\n`;
+      textReport += `• Paid: ${stats.paid}\n`;
+      textReport += `• Pending: ${stats.pending}\n`;
+      textReport += `• Internal: ${stats.internal}\n`;
+      textReport += `• Coupons Issued: ${stats.withCoupons}\n\n`;
+
+      textReport += `🎟️ ATTENDEE LIST WITH VERIFICATION LINKS:\n`;
+      textReport += `========================================================\n\n`;
+      
+      allAttendees.forEach((attendee, index) => {
+        const verificationLink = `${baseUrl}?qrId=${attendee.qrId}`;
+        textReport += `${index + 1}. ${attendee.fullName}\n`;
+        textReport += `   📱 QR ID: ${attendee.qrId}\n`;
+        textReport += `   🔗 Link: ${verificationLink}\n`;
+        textReport += `   📊 Status: ${attendee.status} | Category: ${attendee.category}\n`;
+        textReport += `   ✅ Check-in: ${attendee.checkIn ? 'Yes' : 'No'}${attendee.checkIn ? ` (${attendee.checkInTime})` : ''}\n`;
+        textReport += `   🎟️ Coupon: ${attendee.couponStatus || 'none'}\n`;
+        if (attendee.email) textReport += `   📧 Email: ${attendee.email}\n`;
+        if (attendee.phone) textReport += `   📞 Phone: ${attendee.phone}\n`;
+        textReport += `   🆔 Firebase ID: ${attendee.id}\n`;
+        textReport += `\n`;
+      });
+
+      // Copy comprehensive report to clipboard
+      try {
+        await navigator.clipboard.writeText(textReport);
+        alert(`✅ Complete database downloaded!\n\n📊 CSV File: ${allAttendees.length} attendees with verification links\n📋 Detailed report copied to clipboard\n\nStats: ${stats.checkedIn}/${stats.total} checked in`);
+      } catch (err) {
+        console.log("Clipboard failed, showing modal");
+        // Fallback: show in modal
+        showTextModal(textReport, "Complete Attendee Database Report");
+        alert(`✅ CSV Downloaded! ${allAttendees.length} attendees with verification links`);
+      }
+
+    } catch (error) {
+      console.error("Firebase query error:", error);
+      alert("❌ Error querying Firebase: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper function to show text in a modal
+  const showTextModal = (text, title) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.cssText = 'width:100%;height:400px;font-family:monospace;font-size:12px;padding:16px;border:1px solid #ccc;border-radius:8px';
+    
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px';
+    
+    const content = document.createElement('div');
+    content.style.cssText = 'background:white;padding:24px;border-radius:12px;max-width:90%;max-height:90%;overflow:auto;box-shadow:0 20px 40px rgba(0,0,0,0.3)';
+    
+    const titleEl = document.createElement('h3');
+    titleEl.textContent = title;
+    titleEl.style.cssText = 'margin:0 0 16px 0;font-size:18px;font-weight:600';
+    
+    const copyBtn = document.createElement('button');
+    copyBtn.textContent = 'Copy to Clipboard';
+    copyBtn.style.cssText = 'margin:10px 10px 0 0;padding:8px 16px;background:#4F46E5;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:500';
+    copyBtn.onclick = () => {
+      textarea.select();
+      document.execCommand('copy');
+      copyBtn.textContent = '✅ Copied!';
+      setTimeout(() => copyBtn.textContent = 'Copy to Clipboard', 2000);
+    };
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Close';
+    closeBtn.style.cssText = 'margin-top:10px;padding:8px 16px;background:#6B7280;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:500';
+    closeBtn.onclick = () => document.body.removeChild(modal);
+    
+    content.appendChild(titleEl);
+    content.appendChild(textarea);
+    content.appendChild(copyBtn);
+    content.appendChild(closeBtn);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+    textarea.select();
+  };
+
   return (
     <div className="p-4">
       <h2 className="font-semibold text-xl mb-4">Admin Panel</h2>
@@ -597,7 +859,7 @@ function AdminPanel() {
 
         {/* Bulk Operations */}
         {list.length > 0 && (
-          <div className="flex gap-2 items-center p-3 bg-gray-50 rounded">
+          <div className="flex gap-2 items-center p-3 bg-gray-50 rounded flex-wrap">
             <span className="text-sm text-gray-600">
               {selectedAttendees.size} of {list.length} selected
             </span>
@@ -621,6 +883,32 @@ function AdminPanel() {
                 Bulk Check-in ({selectedAttendees.size})
               </button>
             )}
+            
+            {/* Download Options */}
+            <div className="flex gap-2 ml-auto flex-wrap">
+              <button
+                onClick={downloadAllFirebaseData}
+                className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 flex items-center gap-1 font-medium"
+                title="Query Firebase directly and download complete database"
+                disabled={loading}
+              >
+                🔥 {loading ? 'Querying...' : 'Firebase Export'}
+              </button>
+              <button
+                onClick={downloadAttendeeLinks}
+                className="px-3 py-1 bg-emerald-600 text-white text-sm rounded hover:bg-emerald-700 flex items-center gap-1"
+                title="Download CSV with verification links"
+              >
+                📊 Download CSV
+              </button>
+              <button
+                onClick={generateTextList}
+                className="px-3 py-1 bg-cyan-600 text-white text-sm rounded hover:bg-cyan-700 flex items-center gap-1"
+                title="Copy formatted text list to clipboard"
+              >
+                📋 Copy List
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -629,7 +917,7 @@ function AdminPanel() {
       <div className={viewMode === 'cards' ? 'grid gap-4 md:grid-cols-2' : 'space-y-2'}>
         {list.map(a => (
           viewMode === 'cards' ? (
-            <AttendeeCard key={a.id} attendee={a} showCheckbox={true} isSelected={selectedAttendees.has(a.id)} onSelect={() => toggleSelectAttendee(a.id)} onQuickCheckIn={(e) => quickCheckIn(a, e)} />
+            <AttendeeCard key={a.id} attendee={a} refresh={refreshList} showCheckbox={true} isSelected={selectedAttendees.has(a.id)} onSelect={() => toggleSelectAttendee(a.id)} onQuickCheckIn={(e) => quickCheckIn(a, e)} />
           ) : (
             <div
               key={a.id}

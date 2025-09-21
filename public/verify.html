@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendee Verification - Shifoyage Event</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
+    <style>
+        .qr-code {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .verification-card {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .status-confirmed {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .status-not-found {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        .status-pending {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .procedure-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .step-number {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 12px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="verification-card">
+        <!-- Header -->
+        <div id="header" class="text-white p-6 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <span class="text-xl font-bold">S</span>
+                </div>
+                <h1 class="ml-3 text-2xl font-bold">Shifoyage Event</h1>
+            </div>
+            <p class="text-sm opacity-90">Attendee Verification Portal</p>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+            <!-- Loading State -->
+            <div id="loading" class="text-center">
+                <div class="loading w-16 h-16 mx-auto mb-4 bg-blue-200 rounded-full"></div>
+                <p class="text-gray-600">Verifying QR Code...</p>
+            </div>
+
+            <!-- User Found -->
+            <div id="user-found" class="hidden">
+                <div class="text-center mb-6">
+                    <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Verification Confirmed</h2>
+                    <p class="text-gray-600">Attendee details found successfully</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-gray-700 mb-3">Attendee Information</h3>
+                        <div class="space-y-2">
+                            <p><span class="font-medium">Name:</span> <span id="attendee-name" class="text-gray-900"></span></p>
+                            <p><span class="font-medium">Email:</span> <span id="attendee-email" class="text-gray-900"></span></p>
+                            <p><span class="font-medium">Phone:</span> <span id="attendee-phone" class="text-gray-900"></span></p>
+                            <p><span class="font-medium">QR ID:</span> <span id="attendee-qrid" class="text-gray-900"></span></p>
+                            <p><span class="font-medium">Status:</span> <span id="attendee-status" class="inline-block px-2 py-1 rounded text-sm"></span></p>
+                        </div>
+                    </div>
+
+                    <!-- QR Code Display -->
+                    <div class="qr-code bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-gray-700 mb-3 text-center">QR Code</h4>
+                        <div id="qrcode-container" class="flex justify-center"></div>
+                        <p class="text-center text-sm text-gray-600 mt-2">Scan this code for verification</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Not Found -->
+            <div id="user-not-found" class="hidden text-center">
+                <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Not Found</h2>
+                <p class="text-gray-600 mb-4">No attendee found with this QR ID</p>
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <p class="text-sm text-red-700">
+                        QR ID: <span id="invalid-qrid" class="font-mono font-semibold"></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Manual Input -->
+            <div id="manual-input" class="hidden">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">QR Verification</h2>
+                    <p class="text-gray-600">Enter QR ID to verify attendee</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="qr-input" class="block text-sm font-medium text-gray-700 mb-2">QR ID</label>
+                        <input type="text" id="qr-input" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter QR ID (e.g., QR12345678)">
+                    </div>
+                    <button onclick="verifyQR()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">
+                        Verify QR Code
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hardcoded attendee data
+        const attendeesData = [
+            {
+                id: "12345678",
+                fullName: "John Doe",
+                email: "john.doe@example.com",
+                phone: "+91 9876543210",
+                qrId: "QR12345678",
+                couponStatus: "issued",
+                couponCode: "COUP123456"
+            },
+            {
+                id: "87654321",
+                fullName: "Jane Smith",
+                email: "jane.smith@example.com",
+                phone: "+91 8765432109",
+                qrId: "QR87654321",
+                couponStatus: "pending",
+                couponCode: ""
+            },
+            {
+                id: "11223344",
+                fullName: "Rahul Sharma",
+                email: "rahul.sharma@example.com",
+                phone: "+91 9988776655",
+                qrId: "QR11223344",
+                couponStatus: "issued",
+                couponCode: "COUP789012"
+            },
+            {
+                id: "55667788",
+                fullName: "Priya Patel",
+                email: "priya.patel@example.com",
+                phone: "+91 7766554433",
+                qrId: "QR55667788",
+                couponStatus: "issued",
+                couponCode: "COUP345678"
+            },
+            {
+                id: "99887766",
+                fullName: "Amit Kumar",
+                email: "amit.kumar@example.com",
+                phone: "+91 6655443322",
+                qrId: "QR99887766",
+                couponStatus: "pending",
+                couponCode: ""
+            }
+        ];
+
+        // Get query parameter
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Generate QR Code
+        function generateQRCode(text, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            try {
+                const qr = qrcode(0, 'M');
+                qr.addData(text);
+                qr.make();
+                
+                const qrDiv = document.createElement('div');
+                qrDiv.innerHTML = qr.createImgTag(4, 8);
+                qrDiv.className = 'inline-block border border-gray-300 rounded-lg p-2 bg-white';
+                container.appendChild(qrDiv);
+            } catch (error) {
+                console.error('QR Code generation failed:', error);
+                container.innerHTML = '<p class="text-red-500">QR Code generation failed</p>';
+            }
+        }
+
+        // Display user information
+        function displayUser(user) {
+            const header = document.getElementById('header');
+            const userFound = document.getElementById('user-found');
+            
+            header.className = 'status-confirmed text-white p-6 text-center';
+            
+            document.getElementById('attendee-name').textContent = user.fullName;
+            document.getElementById('attendee-email').textContent = user.email;
+            document.getElementById('attendee-phone').textContent = user.phone;
+            document.getElementById('attendee-qrid').textContent = user.qrId;
+            
+            const statusElement = document.getElementById('attendee-status');
+            statusElement.textContent = user.couponStatus === 'issued' ? 'Confirmed' : 'Pending';
+            statusElement.className = user.couponStatus === 'issued' 
+                ? 'inline-block px-2 py-1 rounded text-sm bg-green-100 text-green-800'
+                : 'inline-block px-2 py-1 rounded text-sm bg-yellow-100 text-yellow-800';
+            
+            // Generate QR Code
+            generateQRCode(user.qrId, 'qrcode-container');
+            
+            userFound.classList.remove('hidden');
+        }
+
+        // Display not found message
+        function displayNotFound(qrId) {
+            const header = document.getElementById('header');
+            const userNotFound = document.getElementById('user-not-found');
+            
+            header.className = 'status-not-found text-white p-6 text-center';
+            document.getElementById('invalid-qrid').textContent = qrId || 'Unknown';
+            
+            userNotFound.classList.remove('hidden');
+        }
+
+        // Display manual input
+        function displayManualInput() {
+            const header = document.getElementById('header');
+            const manualInput = document.getElementById('manual-input');
+            
+            header.className = 'bg-blue-600 text-white p-6 text-center';
+            manualInput.classList.remove('hidden');
+        }
+
+        // Verify QR code
+        function verifyQR(qrId = null) {
+            const qrToVerify = qrId || document.getElementById('qr-input').value.trim();
+            
+            if (!qrToVerify) {
+                alert('Please enter a QR ID');
+                return;
+            }
+            
+            // Show loading
+            hideAllSections();
+            document.getElementById('loading').classList.remove('hidden');
+            
+            // Simulate API delay
+            setTimeout(() => {
+                const user = attendeesData.find(attendee => 
+                    attendee.qrId.toLowerCase() === qrToVerify.toLowerCase()
+                );
+                
+                hideAllSections();
+                
+                if (user) {
+                    displayUser(user);
+                } else {
+                    displayNotFound(qrToVerify);
+                }
+            }, 1500);
+        }
+
+        // Hide all sections
+        function hideAllSections() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('user-found').classList.add('hidden');
+            document.getElementById('user-not-found').classList.add('hidden');
+            document.getElementById('manual-input').classList.add('hidden');
+        }
+
+        // Initialize page
+        function init() {
+            const qrId = getQueryParam('qrId');
+            
+            if (qrId) {
+                verifyQR(qrId);
+            } else {
+                hideAllSections();
+                displayManualInput();
+            }
+        }
+
+        // Handle Enter key in input
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            
+            document.getElementById('qr-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    verifyQR();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
